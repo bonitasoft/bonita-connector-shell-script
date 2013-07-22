@@ -16,6 +16,7 @@ package org.bonitasoft.connectors.scripting;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,54 +93,93 @@ public class ShellConnector extends AbstractConnector {
         LOGGER.info(PARAMETER + " " + parameterInput);
         final String scriptInput = (String) getInputParameter(SCRIPT);
         LOGGER.info(SCRIPT + " " + scriptInput);
+
+        File tmpFile = createTempFile();
+        writeScriptToFile(scriptInput, tmpFile);
+
+        Process pr = executeScript(interpreterInput, parameterInput, tmpFile);
+
+        StringBuilder builder;
+        builder = readOutput(pr);
+        setOutputParameter("result", builder.toString());
+        setOutputParameter("exitStatus", getExitStatus(pr));
+    }
+
+    private int getExitStatus(Process pr) throws ConnectorException {
         try {
-            BufferedReader input = null;
-            Process pr = null;
-            FileWriter fw = null;
-            File tmpFile;
-
-            try {
-                tmpFile = File.createTempFile("script", getExtension());
-                tmpFile.setExecutable(true);
-                tmpFile.deleteOnExit();
-                fw = new FileWriter(tmpFile);
-                fw.write(scriptInput);
-                fw.close();
-
-                Runtime rt = Runtime.getRuntime();
-                String args[] = { interpreterInput, parameterInput, tmpFile.getCanonicalPath() };
-                pr = rt.exec(args);
-                pr.getOutputStream().close();
-                input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-                String line = input.readLine();
-                StringBuilder builder = new StringBuilder();
-                String lineSep = System.getProperty("line.separator");
-                while (line != null) {
-                    builder.append(line);
-                    builder.append(lineSep);
-                    line = input.readLine();
-                }
-                setOutputParameter("result", builder.toString());
-                setOutputParameter("exitStatus", pr.waitFor());
-                tmpFile.delete();
-
-            } catch (Exception e) {
-                throw new ConnectorException(e.getMessage(), e.getCause());
-            } finally {
-
-                if (input != null) {
-                    input.close();
-                }
-                if (pr != null) {
-                    pr.destroy();
-                }
-                if (fw != null) {
-                    fw.close();
-                }
-
-            }
-        } catch (Exception e) {
-            throw new ConnectorException(e.getMessage(), e.getCause());
+            return pr.waitFor();
+        } catch (InterruptedException e) {
+            throw new ConnectorException("Unable to retrieve script exit status", e);
         }
+    }
+
+    private StringBuilder readOutput(Process pr) throws ConnectorException {
+        BufferedReader input;
+        input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String line = readInputLine(input);
+        StringBuilder builder = new StringBuilder();
+        String lineSep = System.getProperty("line.separator");
+        while (line != null) {
+            builder.append(line);
+            builder.append(lineSep);
+            line = readInputLine(input);
+        }
+        return builder;
+    }
+
+    private String readInputLine(BufferedReader input) throws ConnectorException {
+        String line;
+        try {
+            line = input.readLine();
+        } catch (IOException e) {
+            throw new ConnectorException("Unable to retrieve script output", e);
+        }
+        return line;
+    }
+
+    private Process executeScript(String interpreterInput, String parameterInput, File tmpFile) throws ConnectorException {
+        Process pr;
+        String args[];
+        try {
+            args = new String[]{interpreterInput, parameterInput, tmpFile.getCanonicalPath()};
+        } catch (IOException e) {
+            throw new ConnectorException("Unable to retrieve temporary file", e);
+        }
+
+        Runtime rt = Runtime.getRuntime();
+        try {
+            pr = rt.exec(args);
+            pr.getOutputStream().close();
+        } catch (IOException e) {
+            throw new ConnectorException("Unable to execute script", e);
+        }
+        return pr;
+    }
+
+    private void writeScriptToFile(String scriptInput, File tmpFile) throws ConnectorException {
+
+        FileWriter fw;
+        try {
+            fw = new FileWriter(tmpFile);
+            fw.write(scriptInput);
+            fw.close();
+        } catch (IOException e) {
+            throw new ConnectorException("Unable to write script to temporary file", e);
+        }
+    }
+
+    private File createTempFile() throws ConnectorException {
+        File tmpFile;
+        try {
+            tmpFile = File.createTempFile("script", getExtension());
+        } catch (IOException e) {
+            throw new ConnectorException("Unable to create temporary file", e);
+        }
+        if (!tmpFile.setExecutable(true)) {
+            throw new ConnectorException("Unable to make temporary file executable");
+        }
+        tmpFile.deleteOnExit();
+        return tmpFile;
+
     }
 }
