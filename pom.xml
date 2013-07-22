@@ -8,7 +8,7 @@
 	
 	<artifactId>bonita-connector-scripting</artifactId>
 	<packaging>pom</packaging>
-	<version>6.0.2-SNAPSHOT</version>
+	<version>6.0.2-rc-01</version>
 	
 	<modules>
 		<module>bonita-connector-scripting-groovy-def</module>
@@ -31,7 +31,8 @@
         <developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-scripting.git</developerConnection>
         <connection>scm:git:git@github.com:bonitasoft/bonita-connector-scripting.git</connection>
         <url>https://github.com/bonitasoft/bonita-connector-scripting</url>
-    </scm>
+      <tag>bonita-connector-scripting-6.0.2-rc-01</tag>
+  </scm>
 
 
 
