@@ -16,6 +16,7 @@ package org.bonitasoft.connectors.scripting;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,60 +87,82 @@ public class ShellConnector extends AbstractConnector {
 
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
-        final String interpreterInput = (String) getInputParameter(INTERPRETER);
-        LOGGER.info(INTERPRETER + " " + interpreterInput);
-        final String parameterInput = (String) getInputParameter(PARAMETER);
-        LOGGER.info(PARAMETER + " " + parameterInput);
-        final String scriptInput = (String) getInputParameter(SCRIPT);
-        LOGGER.info(SCRIPT + " " + scriptInput);
+        String interpreterInput = getParameter(INTERPRETER);
+        String parameterInput = getParameter(PARAMETER);
+        String scriptInput = getParameter(SCRIPT);
+        
+        Process process = null;
         try {
-            BufferedReader input = null;
-            Process pr = null;
-            FileWriter fw = null;
-            File tmpFile;
+            File script = createExecutableScript(scriptInput);
+            process = runScript(interpreterInput, parameterInput, script);
+            String processOutput = consumeProcessOutput(process);
 
-            try {
-                tmpFile = File.createTempFile("script", getExtension());
-                tmpFile.setExecutable(true);
-                tmpFile.deleteOnExit();
-                fw = new FileWriter(tmpFile);
-                fw.write(scriptInput);
-                fw.close();
+            setOutputParameter("result", processOutput);
+            setOutputParameter("exitStatus", process.waitFor());
+            script.delete();
 
-                Runtime rt = Runtime.getRuntime();
-                String args[] = { interpreterInput, parameterInput, tmpFile.getCanonicalPath() };
-                pr = rt.exec(args);
-                pr.getOutputStream().close();
-                input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-                String line = input.readLine();
-                StringBuilder builder = new StringBuilder();
-                String lineSep = System.getProperty("line.separator");
-                while (line != null) {
-                    builder.append(line);
-                    builder.append(lineSep);
-                    line = input.readLine();
-                }
-                setOutputParameter("result", builder.toString());
-                setOutputParameter("exitStatus", pr.waitFor());
-                tmpFile.delete();
-
-            } catch (Exception e) {
-                throw new ConnectorException(e.getMessage(), e.getCause());
-            } finally {
-
-                if (input != null) {
-                    input.close();
-                }
-                if (pr != null) {
-                    pr.destroy();
-                }
-                if (fw != null) {
-                    fw.close();
-                }
-
-            }
         } catch (Exception e) {
             throw new ConnectorException(e.getMessage(), e.getCause());
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
+    }
+
+    private String getParameter(String parameterName) {
+        final String interpreterInput = (String) getInputParameter(parameterName);
+        LOGGER.info(parameterName + " " + interpreterInput);
+        return interpreterInput;
+    }
+
+    private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
+        String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
+        Process process = Runtime.getRuntime().exec(args);
+        
+        // close unused streams
+        process.getOutputStream().close();
+        process.getErrorStream().close();
+        return process;
+    }
+
+    private String consumeProcessOutput(Process process) throws IOException {
+        BufferedReader scriptOutputReader = null;
+        try {
+            scriptOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = scriptOutputReader.readLine();
+            StringBuilder builder = new StringBuilder();
+            String lineSep = System.getProperty("line.separator");
+            while (line != null) {
+                builder.append(line);
+                builder.append(lineSep);
+                line = scriptOutputReader.readLine();
+            }
+            return builder.toString();
+        } finally {
+            try {
+                if (scriptOutputReader != null) scriptOutputReader.close();
+            } catch (Exception e) {
+                LOGGER.warning("Unable to close " + scriptOutputReader.toString());
+            }
+        }
+    }
+
+    private File createExecutableScript(final String scriptInput) throws IOException {
+        FileWriter fw = null;
+        try {
+            File tmpFile = File.createTempFile("script", getExtension());
+            tmpFile.setExecutable(true);
+            tmpFile.deleteOnExit();
+            fw = new FileWriter(tmpFile);
+            fw.write(scriptInput);
+            return tmpFile;
+        } finally {
+            try {
+                if (fw != null) fw.close();
+            } catch (Exception e) {
+                LOGGER.warning("Unable to close " + fw.toString());
+            }
         }
     }
 }
