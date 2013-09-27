@@ -72,19 +72,6 @@ public class ShellConnector extends AbstractConnector {
         }
     }
 
-    private String getExtension() {
-        final String interpreter = (String) getInputParameter(INTERPRETER);
-        if (interpreter.contains("cmd"))
-            return ".bat";
-        else if (interpreter.contains("powershell"))
-            return ".ps1";
-        else if (interpreter.contains("sh"))
-            return ".sh";
-        else
-            return "";
-
-    }
-
     @Override
     protected void executeBusinessLogic() throws ConnectorException {
         String interpreterInput = getParameter(INTERPRETER);
@@ -111,9 +98,40 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private String getParameter(String parameterName) {
-        final String interpreterInput = (String) getInputParameter(parameterName);
-        LOGGER.info(parameterName + " " + interpreterInput);
-        return interpreterInput;
+        final String value = (String) getInputParameter(parameterName);
+        LOGGER.info(parameterName + " " + value);
+        return value;
+    }
+
+    private File createExecutableScript(final String scriptInput) throws IOException {
+        FileWriter fw = null;
+        try {
+            File tmpFile = File.createTempFile("script", getExtension());
+            tmpFile.setExecutable(true);
+            tmpFile.deleteOnExit();
+            fw = new FileWriter(tmpFile);
+            fw.write(scriptInput);
+            return tmpFile;
+        } finally {
+            try {
+                if (fw != null) fw.close();
+            } catch (Exception e) {
+                LOGGER.warning("Unable to close " + fw.toString());
+            }
+        }
+    }
+
+    private String getExtension() {
+        final String interpreter = (String) getInputParameter(INTERPRETER);
+        if (interpreter.contains("cmd"))
+            return ".bat";
+        else if (interpreter.contains("powershell"))
+            return ".ps1";
+        else if (interpreter.contains("sh"))
+            return ".sh";
+        else
+            return "";
+    
     }
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
@@ -144,24 +162,6 @@ public class ShellConnector extends AbstractConnector {
                 if (scriptOutputReader != null) scriptOutputReader.close();
             } catch (Exception e) {
                 LOGGER.warning("Unable to close " + scriptOutputReader.toString());
-            }
-        }
-    }
-
-    private File createExecutableScript(final String scriptInput) throws IOException {
-        FileWriter fw = null;
-        try {
-            File tmpFile = File.createTempFile("script", getExtension());
-            tmpFile.setExecutable(true);
-            tmpFile.deleteOnExit();
-            fw = new FileWriter(tmpFile);
-            fw.write(scriptInput);
-            return tmpFile;
-        } finally {
-            try {
-                if (fw != null) fw.close();
-            } catch (Exception e) {
-                LOGGER.warning("Unable to close " + fw.toString());
             }
         }
     }
