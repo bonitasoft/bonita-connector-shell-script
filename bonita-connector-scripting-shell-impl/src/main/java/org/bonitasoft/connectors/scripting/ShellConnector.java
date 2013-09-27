@@ -160,8 +160,9 @@ public class ShellConnector extends AbstractConnector {
         } finally {
             try {
                 if (scriptOutputReader != null) scriptOutputReader.close();
+                if (process.getInputStream() != null) process.getInputStream().close();
             } catch (Exception e) {
-                LOGGER.warning("Unable to close " + scriptOutputReader.toString());
+                LOGGER.warning("Unable to close process inpustream");
             }
         }
     }
