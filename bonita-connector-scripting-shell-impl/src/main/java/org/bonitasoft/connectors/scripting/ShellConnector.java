@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2013 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,9 @@ public class ShellConnector extends AbstractConnector {
 
             setOutputParameter("result", processOutput);
             setOutputParameter("exitStatus", process.waitFor());
-            script.delete();
+            if(!script.delete()){
+            	LOGGER.info("Script not cleaned after connector execution."+script.getName());
+            }
 
         } catch (Exception e) {
             throw new ConnectorException(e.getMessage(), e.getCause());
@@ -136,18 +139,35 @@ public class ShellConnector extends AbstractConnector {
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
         String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
-        Process process = Runtime.getRuntime().exec(args);
+        Process process = null;
+		try {
+			process = Runtime.getRuntime().exec(args);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally{
+			if(process != null){
+				// close unused streams
+				try {
+					process.getOutputStream().close();
+				} catch (IOException e) {
+					LOGGER.warning("Unable to close " + e.getMessage());
+				}
+				try {
+					process.getErrorStream().close();
+				} catch (IOException e) {
+					LOGGER.warning("Unable to close " + e.getMessage());
+				}			
+			}
+		}
         
-        // close unused streams
-        process.getOutputStream().close();
-        process.getErrorStream().close();
         return process;
     }
 
     private String consumeProcessOutput(Process process) throws IOException {
         BufferedReader scriptOutputReader = null;
-        try {
-            scriptOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        final InputStream processInputStream = process.getInputStream();
+		try {
+            scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream));
             String line = scriptOutputReader.readLine();
             StringBuilder builder = new StringBuilder();
             String lineSep = System.getProperty("line.separator");
@@ -159,8 +179,12 @@ public class ShellConnector extends AbstractConnector {
             return builder.toString();
         } finally {
             try {
-                if (scriptOutputReader != null) scriptOutputReader.close();
-                if (process.getInputStream() != null) process.getInputStream().close();
+                if (scriptOutputReader != null){
+                	scriptOutputReader.close();
+                }
+                if (processInputStream != null){
+                	processInputStream.close();
+                }
             } catch (Exception e) {
                 LOGGER.warning("Unable to close process inpustream");
             }
