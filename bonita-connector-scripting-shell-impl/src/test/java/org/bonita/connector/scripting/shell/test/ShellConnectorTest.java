@@ -68,7 +68,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            story = "Tests the execution of a script files with multiples lines through the connector")
+            story = "Tests the execution of a script files with multiples lines through the connector", jira = "")
     @Test
     public void testMultiLineScript() throws Exception {
         if (isUnix() || isWindows() || isMac()) {
@@ -86,7 +86,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            story = "Tests the execution of a simple command through the connector")
+            story = "Tests the execution of a simple command through the connector", jira = "")
     @Test
     public void testCurrentDirectory() throws Exception {
         if (isUnix() || isWindows() || isMac()) {
@@ -103,7 +103,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            story = "Tests that we get back the exit status")
+            story = "Tests that we get back the exit status", jira = "")
     @Test
     public void testExit() throws Exception {
         if (isMac() || isUnix() || isWindows()) {
@@ -119,7 +119,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            story = "Tests statement after a sleep are displayed")
+            story = "Tests statement after a sleep are displayed", jira = "")
     @Test
     public void testSleep() throws Exception {
         if (isMac() || isUnix() || isWindows()) {
@@ -143,7 +143,7 @@ public class ShellConnectorTest extends ConnectorTest {
 
     @Ignore
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            story = "Tests a powershell execution")
+            story = "Tests a powershell execution", jira = "")
     @Test
     public void testPowershell() throws Exception {
         if (isWindows()) {
@@ -159,7 +159,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            exceptions = { ConnectorValidationException.class }, story = "Checks that there is an exception if some parameters are empty or absent")
+            exceptions = { ConnectorValidationException.class }, story = "Checks that there is an exception if some parameters are empty or absent", jira = "")
     @Test(expected = Exception.class)
     public void testWrongParameters() throws Exception {
         if (isMac() || isUnix() || isWindows()) {
@@ -171,7 +171,7 @@ public class ShellConnectorTest extends ConnectorTest {
     }
 
     @Cover(classes = { ShellConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "shell", "script" },
-            exceptions = { ConnectorValidationException.class }, story = "Checks that there is an exception script is written by a fool.")
+            exceptions = { ConnectorValidationException.class }, story = "Checks that there is an exception script is written by a fool.", jira = "")
     @Test
     public void testRottenScript() throws Exception {
         if (isMac() || isUnix() || isWindows()) {
