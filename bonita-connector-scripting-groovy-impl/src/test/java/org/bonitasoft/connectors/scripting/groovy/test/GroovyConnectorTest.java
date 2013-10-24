@@ -30,7 +30,7 @@ import org.junit.Test;
 public class GroovyConnectorTest {
 
     @Cover(classes = { GroovyConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "groovy" },
-            story = "Executes a simple groovy script")
+            story = "Executes a simple groovy script", jira = "")
     @Test
     public void executeSimpleScript() throws Exception {
         assertEquals("test", executeConnectorWith("test"));
