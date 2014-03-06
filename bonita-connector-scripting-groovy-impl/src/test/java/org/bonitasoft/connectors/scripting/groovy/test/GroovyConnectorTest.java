@@ -20,18 +20,12 @@ import java.util.HashMap;
 import org.bonitasoft.connectors.scripting.GroovyConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
-import org.bonitasoft.engine.test.annotation.Cover;
-import org.bonitasoft.engine.test.annotation.Cover.BPMNConcept;
-import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
  */
 public class GroovyConnectorTest {
 
-    @Cover(classes = { GroovyConnector.class }, concept = BPMNConcept.CONNECTOR, keywords = { "groovy" },
-            story = "Executes a simple groovy script", jira = "")
-    @Test
     public void executeSimpleScript() throws Exception {
         assertEquals("test", executeConnectorWith("test"));
     }
