@@ -6,7 +6,7 @@
 	<description>Support scripts or commands on any kind of system</description>
 	<implementationClassname>org.bonitasoft.connectors.scripting.ShellConnector</implementationClassname>
 	<implementationId>scripting-shell-impl</implementationId>
-	<implementationVersion>1.0.10</implementationVersion>
+	<implementationVersion>$implementation.version$</implementationVersion>
 
 $Dependencies$
 

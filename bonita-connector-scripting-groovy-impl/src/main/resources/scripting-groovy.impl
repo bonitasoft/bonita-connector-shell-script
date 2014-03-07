@@ -6,7 +6,7 @@
     <description>Support Groovy 1.8.6</description>
 	<implementationClassname>org.bonitasoft.connectors.scripting.GroovyConnector</implementationClassname>
 	<implementationId>scripting-groovy-impl</implementationId>
-	<implementationVersion>1.0.10</implementationVersion>
+	<implementationVersion>$implementation.version$</implementationVersion>
 
 $Dependencies$
 
