@@ -9,15 +9,16 @@
 
 	<artifactId>bonita-connector-scripting-shell-impl</artifactId>
 	<version>1.0.10</version>
-    <properties>
-        <implementation.id>scripting-shell</implementation.id>
-    </properties>
+  	
+  	<properties>
+		<definition.version>1.0.0</definition.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<artifactId>bonita-connector-scripting-shell-def</artifactId>
 			<groupId>org.bonitasoft.connectors</groupId>
-			<version>1.0.0</version>
+			<version>${definition.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

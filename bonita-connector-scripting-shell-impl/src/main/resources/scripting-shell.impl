@@ -2,7 +2,7 @@
 <implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
 
 	<definitionId>scripting-shell</definitionId>
-	<definitionVersion>1.0.0</definitionVersion>
+	<definitionVersion>$definition.version$</definitionVersion>
 	<description>Support scripts or commands on any kind of system</description>
 	<implementationClassname>org.bonitasoft.connectors.scripting.ShellConnector</implementationClassname>
 	<implementationId>scripting-shell-impl</implementationId>
