@@ -7,7 +7,9 @@
 
 	<category id="Script" icon="scripting.png" />
 
-	<input name="script" type="java.lang.Object" mandatory="true" />
+	<input name="script" type="java.lang.String" mandatory="true" />
+	<input name="variables" type="java.util.List" />
+
 	<output name="result" type="java.lang.Object" />
 
 	<page id="groovy">
