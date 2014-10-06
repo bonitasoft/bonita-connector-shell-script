@@ -15,14 +15,19 @@
 package org.bonitasoft.connectors.scripting;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bonitasoft.engine.api.APIAccessor;
+import org.bonitasoft.engine.api.IdentityAPI;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
+import org.bonitasoft.engine.expression.ExpressionConstants;
 import org.junit.Test;
 
 public class GroovyScriptConnectorTest {
@@ -95,6 +100,26 @@ public class GroovyScriptConnectorTest {
 
         final Integer result = (Integer) execute.get(GroovyScriptConnector.RESULT);
         assertThat(result).isEqualTo(83);
+    }
+
+    @Test
+    public void execute_should_use_a_provided_dependency() throws Exception {
+        final List<List<Object>> context = new ArrayList<List<Object>>();
+        final List<Object> var1 = new ArrayList<Object>();
+        var1.add(ExpressionConstants.API_ACCESSOR.getEngineConstantName());
+        var1.add(83);
+        context.add(var1);
+        final APIAccessor apiAccessor = mock(APIAccessor.class);
+        final IdentityAPI identityAPI = mock(IdentityAPI.class);
+        when(apiAccessor.getIdentityAPI()).thenReturn(identityAPI);
+        when(identityAPI.getNumberOfUsers()).thenReturn(54L);
+        final GroovyScriptConnector connector = buildConnector("apiAccessor.getIdentityAPI().getNumberOfUsers();", context);
+        connector.setAPIAccessor(apiAccessor);
+
+        final Map<String, Object> execute = connector.execute();
+
+        final Long result = (Long) execute.get(GroovyScriptConnector.RESULT);
+        assertThat(result).isEqualTo(54L);
     }
 
 }
