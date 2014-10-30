@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -9,45 +8,32 @@
 	</parent>
 
 	<artifactId>bonita-connector-scripting-groovy-impl</artifactId>
-	<version>1.1.0</version>
-
+	<version>1.0.10</version>
+	
 	<properties>
-		<definition.version>1.1.0</definition.version>
+		<definition.version>1.0.0</definition.version>
 	</properties>
-
+	
 	<dependencies>
 		<dependency>
 			<artifactId>bonita-connector-scripting-groovy-def</artifactId>
 			<groupId>org.bonitasoft.connectors</groupId>
 			<version>${definition.version}</version>
 		</dependency>
-		<!-- provided by the engine -->
-		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
-			<version>1.8.6</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
+
 
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
-		</plugins>
+        </plugins>
 	</build>
-
+	
 </project>
