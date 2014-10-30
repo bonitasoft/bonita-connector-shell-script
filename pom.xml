@@ -16,6 +16,8 @@
 		<module>bonita-connector-scripting-groovy-impl</module>
 		<module>bonita-connector-scripting-shell-def</module>
 		<module>bonita-connector-scripting-shell-impl</module>
+		<module>bonita-connector-scripting-groovy-script-def</module>
+		<module>bonita-connector-scripting-groovy-script-impl</module>
 	</modules>
 
 	<build>
