@@ -25,7 +25,6 @@ import java.util.Map;
 import org.bonitasoft.engine.connector.AbstractConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
-import org.bonitasoft.engine.expression.ExpressionConstants;
 
 /**
  * @author Matthieu Chaffotte
@@ -70,11 +69,7 @@ public class GroovyScriptConnector extends AbstractConnector {
                     final Object valueContent = rows.get(1);
                     if (keyContent != null) {
                         final String key = keyContent.toString();
-                        if (ExpressionConstants.API_ACCESSOR.getEngineConstantName().equals(key)) {
-                            variables.put(key, getAPIAccessor());
-                        } else {
-                            variables.put(key, valueContent);
-                        }
+                        variables.put(key, valueContent);
                     }
                 }
             }
