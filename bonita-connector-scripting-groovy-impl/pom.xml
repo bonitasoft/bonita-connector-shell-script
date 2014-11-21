@@ -8,10 +8,10 @@
 	</parent>
 
 	<artifactId>bonita-connector-scripting-groovy-impl</artifactId>
-	<version>1.0.10</version>
+	<version>1.0.11</version>
 	
 	<properties>
-		<definition.version>1.0.0</definition.version>
+		<definition.version>1.0.1</definition.version>
 	</properties>
 	
 	<dependencies>
@@ -27,7 +27,6 @@
 		</dependency>
 	</dependencies>
 
-
 	<build>
 		<plugins>
 			<plugin>
@@ -35,5 +34,5 @@
 			</plugin>
         </plugins>
 	</build>
-	
+
 </project>
