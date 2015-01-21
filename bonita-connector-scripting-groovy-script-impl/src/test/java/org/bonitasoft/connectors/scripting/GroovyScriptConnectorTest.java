@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,6 +122,24 @@ public class GroovyScriptConnectorTest {
 
         final Long result = (Long) execute.get(GroovyScriptConnector.RESULT);
         assertThat(result).isEqualTo(54L);
+    }
+
+    @Test
+    public void execute_should_use_the_current_class_loader() throws Exception {
+        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final URL groovyResource = GroovyScriptConnectorTest.class.getResource("/groovyscripts.jar.bak");
+        final URLClassLoader child = new URLClassLoader(new URL[] { groovyResource }, contextClassLoader);
+        try {
+            Thread.currentThread().setContextClassLoader(child);
+
+            final GroovyScriptConnector connector = buildConnector("SimpleAddition.addition(1, 23)", new ArrayList<List<Object>>());
+            final Map<String, Object> execute = connector.execute();
+
+            final Integer result = (Integer) execute.get(GroovyScriptConnector.RESULT);
+            assertThat(result).isEqualTo(24);
+        } finally {
+            Thread.currentThread().setContextClassLoader(contextClassLoader);
+        }
     }
 
 }

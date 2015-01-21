@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 BonitaSoft S.A.
+ * Copyright (C) 2014, 2015 BonitaSoft S.A.
  * BonitaSoft, 31 rue Gustave Eiffel - 38000 Grenoble
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ public class GroovyScriptConnector extends AbstractConnector {
         final String script = (String) getInputParameter(SCRIPT);
         final Map<String, Object> variables = getVariables();
         final Binding binding = new Binding(variables);
-        final GroovyShell shell = new GroovyShell(binding);
+        final GroovyShell shell = new GroovyShell(Thread.currentThread().getContextClassLoader(), binding);
         try {
             final Object result = shell.evaluate(script);
             setOutputParameter(RESULT, result);
