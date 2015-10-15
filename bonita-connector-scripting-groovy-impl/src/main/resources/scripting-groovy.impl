@@ -3,7 +3,7 @@
 
 	<definitionId>scripting-groovy</definitionId>
 	<definitionVersion>$definition.version$</definitionVersion>
-    <description>Support Groovy 1.8.6</description>
+    <description>Support Groovy 2.4.4</description>
 	<implementationClassname>org.bonitasoft.connectors.scripting.GroovyConnector</implementationClassname>
 	<implementationId>scripting-groovy-impl</implementationId>
 	<implementationVersion>$implementation.version$</implementationVersion>
