@@ -8,5 +8,6 @@
 	</parent>
 
 	<artifactId>bonita-connector-scripting-groovy-script-def</artifactId>
-
+    <version>1.0.1</version>
+    
 </project>

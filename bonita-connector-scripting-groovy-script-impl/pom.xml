@@ -11,7 +11,7 @@
 	<version>1.0.2</version>
 
 	<properties>
-		<definition.version>1.0.0</definition.version>
+		<definition.version>1.0.1</definition.version>
 	</properties>
 
 	<dependencies>
