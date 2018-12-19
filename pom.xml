@@ -8,26 +8,7 @@
 	</parent>
 
 	<artifactId>bonita-connector-scripting</artifactId>
-	<version>1.0.0</version>
-	<packaging>pom</packaging>
-
-	<modules>
-		<module>bonita-connector-scripting-groovy-def</module>
-		<module>bonita-connector-scripting-groovy-impl</module>
-		<module>bonita-connector-scripting-shell-def</module>
-		<module>bonita-connector-scripting-shell-impl</module>
-		<module>bonita-connector-scripting-groovy-script-def</module>
-		<module>bonita-connector-scripting-groovy-script-impl</module>
-	</modules>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+	<version>1.1.0-SNAPSHOT</version>
 
 	<properties>
 		<bonita.engine.version>6.2.0</bonita.engine.version>
@@ -43,7 +24,117 @@
 			<version>${bonita.engine.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>2.4.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>1.7.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.10.8</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.5.3</version>
+                    <configuration>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.5</version>
+                    <executions>
+                        <execution>
+                            <id>assemble</id>
+                            <phase>none</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>all</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>${basedir}/connector-assembly.xml</descriptor>
+                            <appendAssemblyId>true</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>groovy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>${basedir}/groovy-assembly.xml</descriptor>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>groovyScript</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>${basedir}/groovyScript-assembly.xml</descriptor>
+                        </configuration>
+                    </execution>
+                     <execution>
+                        <id>shell</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptor>${basedir}/shell-assembly.xml</descriptor>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 	<scm>
 		<developerConnection>scm:git:git@github.com:bonitasoft/bonita-connector-scripting.git</developerConnection>
