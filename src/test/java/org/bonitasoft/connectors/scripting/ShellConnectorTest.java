@@ -134,6 +134,22 @@ public class ShellConnectorTest extends ConnectorTest {
         assertThat(shell.getExitStatus()).as("exit status").isEqualTo(0);
     }
 
+    @Test
+    public void should_result_contains_standard_error_content() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        if (isWindows()) {
+            parameters.put("script", script("@echo off", "java -version"));
+        } else {
+            parameters.put("script", script("java -version"));
+        }
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isEqualTo(0);
+        assertThat((String) shell.getResult()).isNotEmpty();
+    }
+
     // =================================================================================================================
     // UTILS
     // =================================================================================================================

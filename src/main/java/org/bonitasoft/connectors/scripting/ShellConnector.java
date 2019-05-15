@@ -136,7 +136,7 @@ public class ShellConnector extends AbstractConnector {
         String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
         Process process = null;
 		try {
-			process = Runtime.getRuntime().exec(args);
+            process = new ProcessBuilder(args).redirectErrorStream(true).start();
             return process;
 		} finally{
 			if(process != null){
