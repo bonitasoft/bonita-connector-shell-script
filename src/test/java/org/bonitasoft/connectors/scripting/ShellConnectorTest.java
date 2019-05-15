@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,182 +11,176 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonita.connector.scripting.shell.test;
+package org.bonitasoft.connectors.scripting;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static java.lang.String.join;
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
-import org.bonitasoft.connectors.scripting.ShellConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Hongwen Zang
- *         -Dbonita.home=${workspace_loc}/bos-continuous-integration-tests/bos-local-continuous-integration-tests/target/home -DsmtpServerAddress=192.168.1.211
- *         -DsmtpServerPort=555
  */
 public class ShellConnectorTest extends ConnectorTest {
 
-    private String getInterpreter() {
+    private static final Logger LOGGER = Logger.getLogger(ShellConnectorTest.class.getName());
+
+    @Test
+    public void should_run_multi_line_script() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        parameters.put("script", multiLineShellScript());
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat((String) shell.getResult()).isNotEmpty();
+    }
+
+    @Test
+    public void should_list_content_of_current_directory() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        parameters.put("script", listContentOfCurrentDirectoryShellScript());
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat((String) shell.getResult()).isNotEmpty();
+    }
+
+    @Test
+    public void should_exit_with_non_zero_status() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        parameters.put("script", "exit 3");
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isEqualTo(3);
+    }
+
+    @Test
+    public void should_run_sleep_script() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        if (isMac() || isUnix()) {
+            parameters.put("script", script("echo start"
+                    , "sleep 5"
+                    , "echo end"
+            ));
+        } else {
+            parameters.put("script", script("echo start"
+                    , "ping 123.45.67.89 -n 1 -w 5000 > nul"
+                    , "echo end"
+            ));
+        }
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isEqualTo(0);
+    }
+
+    @Test
+    public void should_run_powershell_on_Windows() throws Exception {
+        assumeIsWindows();
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", "powershell");
+        parameters.put("parameter", "-command");
+        parameters.put("script", "$PSVersionTable");
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isEqualTo(0);
+    }
+
+    @Test
+    public void should_detect_wrong_input_parameters() {
+        assertThatThrownBy(() -> validateAndExecute(emptyMap()))
+                .isInstanceOf(ConnectorValidationException.class)
+                .hasMessageContaining("interpreter cannot be empty!")
+                .hasMessageContaining("parameter cannot be empty!")
+                .hasMessageContaining("script cannot be empty!");
+    }
+
+    @Test
+    public void should_fail_when_script_contains_unknown_command() throws Exception {
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        parameters.put("script", "hefv ghfvg ");
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isNotEqualTo(0);
+    }
+
+    @Test
+    public void should_run_pipe_on_mac_and_linux() throws Exception {
+        assumeIsMacOrUnix();
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("interpreter", defaultOsInterpreter());
+        parameters.put("parameter", defaultOsParameter());
+        parameters.put("script", "ls | wc -l");
+
+        ShellConnector shell = validateAndExecute(parameters);
+        assertThat(shell.getExitStatus()).as("exit status").isEqualTo(0);
+    }
+
+    // =================================================================================================================
+    // UTILS
+    // =================================================================================================================
+
+    private static String defaultOsInterpreter() {
         return isUnix() || isMac() ? "/bin/sh" : "cmd.exe";
     }
 
-    private String getParameter() {
+    private static String defaultOsParameter() {
         return isUnix() || isMac() ? "-c" : "/c";
     }
 
-    private String getShellScript() {
+    private static String listContentOfCurrentDirectoryShellScript() {
         return isUnix() || isMac() ? "ls -lia" : "dir";
     }
 
-    private String getMultiLineShellScript() {
+    private static String multiLineShellScript() {
         if (isUnix() || isMac()) {
-            return "ls \n"
-                    + "var=2"
-                    + "echo $var \n"
-                    + "var=$(($var+1)) \n"
-                    + "echo var"
-                    + "sleep 2";
-        }
-        else {
-            return "dir \n"
-                    + "set var=2 \n"
-                    + "echo %var% \n"
-                    + "set /a var=%var%+1 \n"
-                    + "echo %var% \n"
-                    + "ping 123.45.67.89 -n 1 -w 2500 > nul \n";
-        }
-    }
-
-    
-    @Test
-    public void testMultiLineScript() throws Exception {
-        if (isUnix() || isWindows() || isMac()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(3);
-            parametersMap.put("interpreter", getInterpreter());
-            parametersMap.put("parameter", getParameter());
-            parametersMap.put("script", getMultiLineShellScript());
-            shell.setInputParameters(parametersMap);
-            shell.validateInputParameters();
-            shell.execute();
-            String actual = (String) shell.getResult();
-            assertTrue(actual.length() >= 0);
+            return script("ls"
+                    , "var=2"
+                    , "echo $var"
+                    , "var=$(($var+1))"
+                    , "echo var"
+                    , "sleep 2");
+        } else {
+            return script("dir"
+                    , "set var=2"
+                    , "echo %var%"
+                    , "set /a var=%var%+1"
+                    , "echo %var%"
+                    , "ping 123.45.67.89 -n 1 -w 2500 > nul");
         }
     }
 
-    @Test
-    public void testCurrentDirectory() throws Exception {
-        if (isUnix() || isWindows() || isMac()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(3);
-            parametersMap.put("interpreter", getInterpreter());
-            parametersMap.put("parameter", getParameter());
-            parametersMap.put("script", getShellScript());
-            shell.setInputParameters(parametersMap);
-            shell.execute();
-            String actual = (String) shell.getResult();
-            assertTrue(actual.length() >= 0);
-        }
+    private static String script(String... elements) {
+        return join(lineSeparator(), elements);
     }
 
-    @Test
-    public void testExit() throws Exception {
-        if (isMac() || isUnix() || isWindows()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(3);
-            parametersMap.put("interpreter", getInterpreter());
-            parametersMap.put("parameter", getParameter());
-            parametersMap.put("script", "exit 3");
-            shell.setInputParameters(parametersMap);
-            shell.execute();
-            assertEquals(3, shell.getExitStatus());
-        }
+    private static ShellConnector validateAndExecute(Map<String, Object> parameters) throws ConnectorValidationException, ConnectorException {
+        ShellConnector shell = new ShellConnector();
+        shell.setInputParameters(parameters);
+        shell.validateInputParameters();
+        shell.execute();
+
+        LOGGER.info("Execution status: " + shell.getExitStatus());
+        LOGGER.info("Execution result: " + shell.getResult());
+        return shell;
     }
 
-    @Test
-    public void testSleep() throws Exception {
-        if (isMac() || isUnix() || isWindows()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(3);
-            parametersMap.put("interpreter", getInterpreter());
-            parametersMap.put("parameter", getParameter());
-            String script;
-            script = "echo start \n";
-            if (isMac() || isUnix())
-                script = script + "sleep 5\n";
-            else
-                script = script + "ping 123.45.67.89 -n 1 -w 5000 > nul \n";
-            script = script + "echo end \n";
-            parametersMap.put("script", script);
-            shell.setInputParameters(parametersMap);
-            shell.execute();
-            assertEquals(0, shell.getExitStatus());
-        }
-    }
-
-    @Ignore
-    @Test
-    public void testPowershell() throws Exception {
-        if (isWindows()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(3);
-            parametersMap.put("interpreter", "powershell");
-            parametersMap.put("parameter", "&c");
-            parametersMap.put("script", "ls");
-            shell.setInputParameters(parametersMap);
-            shell.execute();
-            assertEquals(0, shell.getExitStatus());
-        }
-    }
-
-    @Test(expected = Exception.class)
-    public void testWrongParameters() throws Exception {
-        if (isMac() || isUnix() || isWindows()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(1);
-            shell.setInputParameters(parametersMap);
-            shell.validateInputParameters();
-        }
-    }
-
-    @Test
-    public void testRottenScript() throws Exception {
-        if (isMac() || isUnix() || isWindows()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(1);
-            parametersMap.put("interpreter", getInterpreter());
-            parametersMap.put("parameter", getParameter());
-            parametersMap.put("script", "hefv ghfvg ");
-            shell.setInputParameters(parametersMap);
-            shell.validateInputParameters();
-            shell.execute();
-            System.out.println("result:" + shell.getResult());
-            System.out.println("status:" + shell.getExitStatus());
-            assertThat((Integer) shell.getExitStatus(), not(is(0)));
-
-        }
-    }
-
-    @Test
-    public void testPipe() throws ConnectorValidationException, ConnectorException {
-        if (isMac() || isUnix()) {
-            ShellConnector shell = new ShellConnector();
-            final HashMap<String, Object> parametersMap = new HashMap<String, Object>(1);
-            parametersMap.put("interpreter", "/bin/sh");
-            parametersMap.put("parameter", "-c");
-            parametersMap.put("script", "ls | wc -l");
-            shell.setInputParameters(parametersMap);
-            shell.validateInputParameters();
-            shell.execute();
-            assertThat(shell.getExitStatus(), is(shell.getExitStatus()));
-        }
-    }
 }
