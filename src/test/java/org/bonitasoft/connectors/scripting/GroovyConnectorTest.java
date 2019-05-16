@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 BonitaSoft S.A.
+ * Copyright (C) 2012-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -11,7 +11,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
  * Floor, Boston, MA 02110-1301, USA.
  **/
-package org.bonitasoft.connectors.scripting.groovy.test;
+package org.bonitasoft.connectors.scripting;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,13 +20,15 @@ import java.util.HashMap;
 import org.bonitasoft.connectors.scripting.GroovyConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
+import org.junit.Test;
 
 /**
  * @author Baptiste Mesta
  */
 public class GroovyConnectorTest {
 
-    public void executeSimpleScript() throws Exception {
+    @Test
+    public void should_execute_simple_script() throws Exception {
         assertEquals("test", executeConnectorWith("test"));
     }
 

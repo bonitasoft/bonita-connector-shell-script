@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012-2013 BonitaSoft S.A.
+ * Copyright (C) 2012-2019 BonitaSoft S.A.
  * BonitaSoft, 32 rue Gustave Eiffel - 38000 Grenoble
  * This library is free software; you can redistribute it and/or modify it under the terms
  * of the GNU Lesser General Public License as published by the Free Software Foundation
@@ -13,7 +13,10 @@
  **/
 package org.bonitasoft.connectors.scripting;
 
+import static java.util.Optional.ofNullable;
+
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,7 +32,6 @@ import org.bonitasoft.engine.connector.ConnectorValidationException;
 
 /**
  * @author Matthieu Chaffotte, Yanyan Liu, Hongwen Zang, Arthur Freycon
- * 
  */
 public class ShellConnector extends AbstractConnector {
 
@@ -39,9 +41,10 @@ public class ShellConnector extends AbstractConnector {
 
     private static final String SCRIPT = "script";
 
-    private Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    private static final Logger LOGGER = Logger.getLogger(ShellConnector.class.getName());
 
     public ShellConnector() {
+        // do nothing
     }
 
     public Object getExitStatus() {
@@ -54,23 +57,27 @@ public class ShellConnector extends AbstractConnector {
 
     @Override
     public void validateInputParameters() throws ConnectorValidationException {
-        final List<String> errors = new ArrayList<String>(3);
+        final List<String> errors = new ArrayList<>();
         final String interpreter = (String) getInputParameter(INTERPRETER);
-        if (interpreter == null || !(interpreter.length() > 0)) {
+        if (isNullOrEmpty(interpreter)) {
             errors.add("interpreter cannot be empty!");
         }
         final String parameter = (String) getInputParameter(PARAMETER);
-        if (parameter == null || !(parameter.length() > 0)) {
+        if (isNullOrEmpty(parameter)) {
             errors.add("parameter cannot be empty!");
         }
         final String shell = (String) getInputParameter(SCRIPT);
-        if (shell == null || !(shell.length() > 0)) {
+        if (isNullOrEmpty(shell)) {
             errors.add("script cannot be empty!");
         }
 
         if (!errors.isEmpty()) {
             throw new ConnectorValidationException(this, errors);
         }
+    }
+
+    private static boolean isNullOrEmpty(String string) {
+        return string == null || string.isEmpty();
     }
 
     @Override
@@ -88,15 +95,12 @@ public class ShellConnector extends AbstractConnector {
             setOutputParameter("result", processOutput);
             setOutputParameter("exitStatus", process.waitFor());
             if(!script.delete()){
-            	LOGGER.info("Script not cleaned after connector execution."+script.getName());
+                LOGGER.info("Script not cleaned after connector execution." + script.getName());
             }
-
         } catch (Exception e) {
             throw new ConnectorException(e.getMessage(), e.getCause());
         } finally {
-            if (process != null) {
-                process.destroy();
-            }
+            ofNullable(process).ifPresent(Process::destroy);
         }
     }
 
@@ -107,21 +111,13 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private File createExecutableScript(final String scriptInput) throws IOException {
-        FileWriter fw = null;
-        try {
-            File tmpFile = File.createTempFile("script", getExtension());
-            tmpFile.setExecutable(true);
-            tmpFile.deleteOnExit();
-            fw = new FileWriter(tmpFile);
+        File tmpFile = File.createTempFile("script", getExtension());
+        tmpFile.setExecutable(true);
+        tmpFile.deleteOnExit();
+        try (FileWriter fw = new FileWriter(tmpFile)) {
             fw.write(scriptInput);
-            return tmpFile;
-        } finally {
-            try {
-                if (fw != null) fw.close();
-            } catch (Exception e) {
-                LOGGER.warning("Unable to close " + fw.toString());
-            }
         }
+        return tmpFile;
     }
 
     private String getExtension() {
@@ -134,60 +130,46 @@ public class ShellConnector extends AbstractConnector {
             return ".sh";
         else
             return "";
-    
     }
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
         String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
         Process process = null;
 		try {
-			process = Runtime.getRuntime().exec(args);
-		} catch (IOException e) {
-			e.printStackTrace();
+            process = new ProcessBuilder(args).redirectErrorStream(true).start();
+            return process;
 		} finally{
 			if(process != null){
-				// close unused streams
-				try {
-					process.getOutputStream().close();
-				} catch (IOException e) {
-					LOGGER.warning("Unable to close " + e.getMessage());
-				}
-				try {
-					process.getErrorStream().close();
-				} catch (IOException e) {
-					LOGGER.warning("Unable to close " + e.getMessage());
-				}			
+                closeQuietly(process.getOutputStream());
+                closeQuietly(process.getErrorStream());
 			}
 		}
-        
-        return process;
     }
 
     private String consumeProcessOutput(Process process) throws IOException {
-        BufferedReader scriptOutputReader = null;
-        final InputStream processInputStream = process.getInputStream();
-		try {
-            scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream));
-            String line = scriptOutputReader.readLine();
+        try (InputStream processInputStream = process.getInputStream()) {
             StringBuilder builder = new StringBuilder();
-            String lineSep = System.getProperty("line.separator");
-            while (line != null) {
-                builder.append(line);
-                builder.append(lineSep);
-                line = scriptOutputReader.readLine();
+            try (BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
+                String line = scriptOutputReader.readLine();
+                String lineSep = System.getProperty("line.separator");
+                while (line != null) {
+                    builder.append(line);
+                    builder.append(lineSep);
+                    line = scriptOutputReader.readLine();
+                }
             }
             return builder.toString();
-        } finally {
+        }
+    }
+
+    private static void closeQuietly(Closeable closeable) {
+        if (closeable != null) {
             try {
-                if (scriptOutputReader != null){
-                	scriptOutputReader.close();
-                }
-                if (processInputStream != null){
-                	processInputStream.close();
-                }
-            } catch (Exception e) {
-                LOGGER.warning("Unable to close process inpustream");
+                closeable.close();
+            } catch (IOException e) {
+                LOGGER.warning("Unable to close " + e.getMessage());
             }
         }
     }
+
 }
