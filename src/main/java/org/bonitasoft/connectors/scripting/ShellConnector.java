@@ -133,17 +133,17 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
-        String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
+        String args[] = {interpreterInput, parameterInput, script.getCanonicalPath()};
         Process process = null;
-		try {
+        try {
             process = new ProcessBuilder(args).redirectErrorStream(true).start();
             return process;
-		} finally{
-			if(process != null){
+        } finally {
+            if (process != null) {
                 closeQuietly(process.getOutputStream());
                 closeQuietly(process.getErrorStream());
-			}
-		}
+            }
+        }
     }
 
     private String consumeProcessOutput(Process process) throws IOException {
