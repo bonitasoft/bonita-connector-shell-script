@@ -147,16 +147,15 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private String consumeProcessOutput(Process process) throws IOException {
-        try (InputStream processInputStream = process.getInputStream()) {
+        try (InputStream processInputStream = process.getInputStream();
+             BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
             StringBuilder builder = new StringBuilder();
-            try (BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
-                String line = scriptOutputReader.readLine();
-                String lineSep = System.getProperty("line.separator");
-                while (line != null) {
-                    builder.append(line);
-                    builder.append(lineSep);
-                    line = scriptOutputReader.readLine();
-                }
+            String line = scriptOutputReader.readLine();
+            String lineSep = System.getProperty("line.separator");
+            while (line != null) {
+                builder.append(line);
+                builder.append(lineSep);
+                line = scriptOutputReader.readLine();
             }
             return builder.toString();
         }
