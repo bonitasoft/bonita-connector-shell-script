@@ -184,8 +184,8 @@ public class ShellConnectorTest extends ConnectorTest {
         }
     }
 
-    private static String script(String... elements) {
-        return join(lineSeparator(), elements);
+    private static String script(String... scriptLines) {
+        return join(lineSeparator(), scriptLines);
     }
 
     private static ShellConnector validateAndExecute(Map<String, Object> parameters) throws ConnectorValidationException, ConnectorException {
