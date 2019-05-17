@@ -133,30 +133,29 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
-        String args[] = { interpreterInput, parameterInput, script.getCanonicalPath() };
+        String args[] = {interpreterInput, parameterInput, script.getCanonicalPath()};
         Process process = null;
-		try {
+        try {
             process = new ProcessBuilder(args).redirectErrorStream(true).start();
             return process;
-		} finally{
-			if(process != null){
+        } finally {
+            if (process != null) {
                 closeQuietly(process.getOutputStream());
                 closeQuietly(process.getErrorStream());
-			}
-		}
+            }
+        }
     }
 
     private String consumeProcessOutput(Process process) throws IOException {
-        try (InputStream processInputStream = process.getInputStream()) {
+        try (InputStream processInputStream = process.getInputStream();
+             BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
             StringBuilder builder = new StringBuilder();
-            try (BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
-                String line = scriptOutputReader.readLine();
-                String lineSep = System.getProperty("line.separator");
-                while (line != null) {
-                    builder.append(line);
-                    builder.append(lineSep);
-                    line = scriptOutputReader.readLine();
-                }
+            String line = scriptOutputReader.readLine();
+            String lineSep = System.getProperty("line.separator");
+            while (line != null) {
+                builder.append(line);
+                builder.append(lineSep);
+                line = scriptOutputReader.readLine();
             }
             return builder.toString();
         }
