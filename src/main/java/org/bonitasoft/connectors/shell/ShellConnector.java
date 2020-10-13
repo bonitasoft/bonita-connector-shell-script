@@ -118,7 +118,7 @@ public class ShellConnector extends AbstractConnector {
 
     private String getParameter(String parameterName) {
         final String value = (String) getInputParameter(parameterName);
-        logger.info(parameterName + " " + value);
+        logger.info(() -> String.format("%s: %s", parameterName, value));
         return value;
     }
 
