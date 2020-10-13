@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -44,7 +45,7 @@ public class ShellConnector extends AbstractConnector {
 
     private static final String SCRIPT = "script";
 
-    private static final Logger LOGGER = Logger.getLogger(ShellConnector.class.getName());
+    private static final Logger logger = Logger.getLogger(ShellConnector.class.getName());
 
     public ShellConnector() {
         // do nothing
@@ -88,7 +89,7 @@ public class ShellConnector extends AbstractConnector {
         String interpreterInput = getParameter(INTERPRETER);
         String parameterInput = getParameter(PARAMETER);
         String scriptInput = getParameter(SCRIPT);
-        
+
         Process process = null;
         try {
             File script = createExecutableScript(scriptInput);
@@ -97,9 +98,7 @@ public class ShellConnector extends AbstractConnector {
 
             setOutputParameter("result", processOutput);
             setOutputParameter("exitStatus", process.waitFor());
-            if(!script.delete()){
-                LOGGER.info("Script not cleaned after connector execution." + script.getName());
-            }
+            cleanUp(script);
         } catch (Exception e) {
             throw new ConnectorException(e.getMessage(), e.getCause());
         } finally {
@@ -107,20 +106,34 @@ public class ShellConnector extends AbstractConnector {
         }
     }
 
+    private void cleanUp(File script) throws IOException {
+        try {
+            Files.delete(script.toPath());
+        } catch (IOException e) {
+            logger.severe(
+                    () -> String.format("'%s' has not been cleaned after connector execution.", script.getAbsolutePath()));
+            throw e;
+        }
+    }
+
     private String getParameter(String parameterName) {
         final String value = (String) getInputParameter(parameterName);
-        LOGGER.info(parameterName + " " + value);
+        logger.info(parameterName + " " + value);
         return value;
     }
 
     private File createExecutableScript(final String scriptInput) throws IOException {
-        File tmpFile = File.createTempFile("script", getExtension());
-        tmpFile.setExecutable(true);
-        tmpFile.deleteOnExit();
-        try (FileWriter fw = new FileWriter(tmpFile)) {
-            fw.write(scriptInput);
+        File tmpFile = File.createTempFile(SCRIPT, getExtension());
+        if (tmpFile.setExecutable(true)) {
+            tmpFile.deleteOnExit();
+            try (FileWriter fw = new FileWriter(tmpFile)) {
+                fw.write(scriptInput);
+            }
+            return tmpFile;
         }
-        return tmpFile;
+        throw new IOException(
+                String.format("An error occured while trying to make the file '%s' executable. Check your permissions.",
+                        tmpFile.getAbsolutePath()));
     }
 
     private String getExtension() {
@@ -136,7 +149,7 @@ public class ShellConnector extends AbstractConnector {
     }
 
     private Process runScript(final String interpreterInput, final String parameterInput, File script) throws IOException {
-        String args[] = {interpreterInput, parameterInput, script.getCanonicalPath()};
+        String[] args = { interpreterInput, parameterInput, script.getCanonicalPath() };
         Process process = null;
         try {
             process = new ProcessBuilder(args).redirectErrorStream(true).start();
@@ -151,7 +164,7 @@ public class ShellConnector extends AbstractConnector {
 
     private String consumeProcessOutput(Process process) throws IOException {
         try (InputStream processInputStream = process.getInputStream();
-             BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
+                BufferedReader scriptOutputReader = new BufferedReader(new InputStreamReader(processInputStream))) {
             StringBuilder builder = new StringBuilder();
             String line = scriptOutputReader.readLine();
             String lineSep = System.getProperty("line.separator");
@@ -169,7 +182,7 @@ public class ShellConnector extends AbstractConnector {
             try {
                 closeable.close();
             } catch (IOException e) {
-                LOGGER.warning("Unable to close " + e.getMessage());
+                logger.warning("Unable to close " + e.getMessage());
             }
         }
     }
