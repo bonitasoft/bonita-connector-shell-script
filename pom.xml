@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.bonitasoft.connectors</groupId>
-	<artifactId>bonita-connector-shell-script</artifactId>
-	<version>1.1.1-SNAPSHOT</version>
+    <artifactId>bonita-connector-shell-script</artifactId>
+    <version>1.1.1-SNAPSHOT</version>
 
     <name>Bonita Shell Connector</name>
     <description>Shell Connector for Bonita</description>
@@ -26,7 +26,7 @@
         </license>
     </licenses>
 
-	<properties>
+    <properties>
         <!-- Maven -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,7 +40,7 @@
         <shell.impl.version>${project.version}</shell.impl.version>
         <shell.main-class>org.bonitasoft.connectors.shell.ShellConnector</shell.main-class>
     
-		<!-- Bonita -->
+        <!-- Bonita -->
         <bonita.engine.version>7.11.0</bonita.engine.version>
         
         <!-- Test -->
@@ -65,7 +65,7 @@
         <sonar.projectKey>bonitasoft_bonita-connector-shell-script</sonar.projectKey>
         <sonar.organization>bonitasoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-	</properties>
+    </properties>
     
     <dependencyManagement>
         <dependencies>
@@ -79,8 +79,8 @@
         </dependencies>
     </dependencyManagement>
 
-	<dependencies>
-		<!-- Bonita -->
+    <dependencies>
+        <!-- Bonita -->
         <dependency>
             <artifactId>bonita-common</artifactId>
             <groupId>org.bonitasoft.engine</groupId>
@@ -89,25 +89,25 @@
         </dependency>
         
         <!-- Test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>${mockito.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
+    <build>
         <defaultGoal>verify</defaultGoal>
         <resources>
             <resource>

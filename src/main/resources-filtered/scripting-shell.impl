@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<implementation:connectorImplementation xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
+<implementation:connectorImplementation
+    xmlns:implementation="http://www.bonitasoft.org/ns/connector/implementation/6.0">
 
-	<implementationId>${shell.impl.id}</implementationId>
+    <implementationId>${shell.impl.id}</implementationId>
     <implementationVersion>${shell.impl.version}</implementationVersion>
     <definitionId>${shell.def.id}</definitionId>
     <definitionVersion>${shell.def.version}</definitionVersion>
-    <implementationClassname>${shell.main-class}</implementationClassname>
+    <implementationClassname>${shell.main-class}
+    </implementationClassname>
     <hasSources>false</hasSources>
-    <description>Support scripts or commands on any kind of system</description>
+    <description>Support scripts or commands on any kind of system
+    </description>
 
-<!-- retrieved from the pom.xml at build time -->
-${connector-dependencies}
+    <!-- retrieved from the pom.xml at build time -->
+    ${connector-dependencies}
 
 </implementation:connectorImplementation>

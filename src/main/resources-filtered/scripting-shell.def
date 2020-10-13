@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition:ConnectorDefinition xmlns:definition="http://www.bonitasoft.org/ns/connector/definition/6.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<id>${shell.def.id}</id>
-	<version>${shell.def.version}</version>
-	<icon>shell.png</icon>
-	<category id="Script" icon="scripting.png" />
-	
-	<input name="interpreter" type="java.lang.String" mandatory="true" />
-	<input name="parameter" type="java.lang.String" mandatory="true" />
-	<input name="script" type="java.lang.String" mandatory="true" />
+    <id>${shell.def.id}</id>
+    <version>${shell.def.version}</version>
+    <icon>shell.png</icon>
+    <category id="Script" icon="scripting.png" />
+    
+    <input name="interpreter" type="java.lang.String" mandatory="true" />
+    <input name="parameter" type="java.lang.String" mandatory="true" />
+    <input name="script" type="java.lang.String" mandatory="true" />
 
-	<output name="result" type="java.lang.Object" />
-	<output name="exitStatus" type="java.lang.Object" />
+    <output name="result" type="java.lang.Object" />
+    <output name="exitStatus" type="java.lang.Object" />
 
-	<page id="scriptPage">
-		<widget id="interpreter" inputName="interpreter" xsi:type="definition:Text" />
-		<widget id="parameter" inputName="parameter" xsi:type="definition:Text" />
-		<widget id="script" inputName="script" xsi:type="definition:TextArea" />
-	</page>
+    <page id="scriptPage">
+        <widget id="interpreter" inputName="interpreter" xsi:type="definition:Text" />
+        <widget id="parameter" inputName="parameter" xsi:type="definition:Text" />
+        <widget id="script" inputName="script" xsi:type="definition:TextArea" />
+    </page>
 </definition:ConnectorDefinition>
