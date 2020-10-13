@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bonitasoft.connectors.shell.ShellConnector;
 import org.bonitasoft.engine.connector.ConnectorException;
 import org.bonitasoft.engine.connector.ConnectorValidationException;
 import org.junit.Test;
@@ -77,15 +76,9 @@ public class ShellConnectorTest extends ConnectorTest {
         parameters.put("interpreter", defaultOsInterpreter());
         parameters.put("parameter", defaultOsParameter());
         if (isMac() || isUnix()) {
-            parameters.put("script", script("echo start"
-                    , "sleep 5"
-                    , "echo end"
-            ));
+            parameters.put("script", script("echo start", "sleep 5", "echo end"));
         } else {
-            parameters.put("script", script("echo start"
-                    , "ping 123.45.67.89 -n 1 -w 5000 > nul"
-                    , "echo end"
-            ));
+            parameters.put("script", script("echo start", "ping 123.45.67.89 -n 1 -w 5000 > nul", "echo end"));
         }
 
         ShellConnector shell = validateAndExecute(parameters);
@@ -172,19 +165,10 @@ public class ShellConnectorTest extends ConnectorTest {
 
     private static String multiLineShellScript() {
         if (isUnix() || isMac()) {
-            return script("ls"
-                    , "var=2"
-                    , "echo $var"
-                    , "var=$(($var+1))"
-                    , "echo var"
-                    , "sleep 2");
+            return script("ls", "var=2", "echo $var", "var=$(($var+1))", "echo var", "sleep 2");
         } else {
-            return script("dir"
-                    , "set var=2"
-                    , "echo %var%"
-                    , "set /a var=%var%+1"
-                    , "echo %var%"
-                    , "ping 123.45.67.89 -n 1 -w 2500 > nul");
+            return script("dir", "set var=2", "echo %var%", "set /a var=%var%+1", "echo %var%",
+                    "ping 123.45.67.89 -n 1 -w 2500 > nul");
         }
     }
 
@@ -192,7 +176,8 @@ public class ShellConnectorTest extends ConnectorTest {
         return join(lineSeparator(), scriptLines);
     }
 
-    private static ShellConnector validateAndExecute(Map<String, Object> parameters) throws ConnectorValidationException, ConnectorException {
+    private static ShellConnector validateAndExecute(Map<String, Object> parameters)
+            throws ConnectorValidationException, ConnectorException {
         ShellConnector shell = new ShellConnector();
         shell.setInputParameters(parameters);
         shell.validateInputParameters();
