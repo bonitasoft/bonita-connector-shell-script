@@ -6,11 +6,9 @@
     <implementationVersion>${shell.impl.version}</implementationVersion>
     <definitionId>${shell.def.id}</definitionId>
     <definitionVersion>${shell.def.version}</definitionVersion>
-    <implementationClassname>${shell.main-class}
-    </implementationClassname>
+    <implementationClassname>${shell.main-class}</implementationClassname>
     <hasSources>false</hasSources>
-    <description>Support scripts or commands on any kind of system
-    </description>
+    <description>Support scripts or commands on any kind of system</description>
 
     <!-- retrieved from the pom.xml at build time -->
     ${connector-dependencies}
