@@ -48,7 +48,7 @@
         <assertj.version>3.22.0</assertj.version>
         <junit.version>4.13.2</junit.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-        <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         
         <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
