@@ -67,6 +67,7 @@
         <sonar.projectKey>bonitasoft_bonita-connector-shell-script</sonar.projectKey>
         <sonar.organization>bonitasoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
     </properties>
     
     <dependencyManagement>
