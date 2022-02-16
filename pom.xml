@@ -57,17 +57,17 @@
         <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
         <groovy-all.version>2.4.16</groovy-all.version>
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-        <license-maven-plugin.version>4.0.rc2</license-maven-plugin.version>
+        <license-maven-plugin.version>4.1</license-maven-plugin.version>
 
         <!-- Sonar -->
         <sonar.projectKey>bonitasoft_bonita-connector-shell-script</sonar.projectKey>
         <sonar.organization>bonitasoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     
     <dependencyManagement>
