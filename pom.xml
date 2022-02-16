@@ -41,10 +41,12 @@
         <shell.main-class>org.bonitasoft.connectors.shell.ShellConnector</shell.main-class>
     
         <!-- Bonita -->
-        <bonita.engine.version>7.11.0</bonita.engine.version>
+        <bonita.engine.version>7.14.0.beta-01</bonita.engine.version>
         
         <!-- Test -->
         <mockito.version>1.10.19</mockito.version>
+        <assertj.version>3.22.0</assertj.version>
+        <junit.version>4.13.2</junit.version>
         <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
         
@@ -92,12 +94,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+            <version>${assertj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
