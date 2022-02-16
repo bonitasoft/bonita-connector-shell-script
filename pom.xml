@@ -41,7 +41,7 @@
         <shell.main-class>org.bonitasoft.connectors.shell.ShellConnector</shell.main-class>
     
         <!-- Bonita -->
-        <bonita.engine.version>7.13.3</bonita.engine.version>
+        <bonita.engine.version>7.13.0</bonita.engine.version>
         
         <!-- Test -->
         <mockito.version>1.10.19</mockito.version>
