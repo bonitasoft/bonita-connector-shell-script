@@ -28,7 +28,7 @@
 
     <properties>
         <!-- Maven -->
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy.MM.dd-hh.mm</maven.build.timestamp.format>
@@ -41,12 +41,14 @@
         <shell.main-class>org.bonitasoft.connectors.shell.ShellConnector</shell.main-class>
     
         <!-- Bonita -->
-        <bonita.engine.version>7.11.0</bonita.engine.version>
+        <bonita.engine.version>7.13.0</bonita.engine.version>
         
         <!-- Test -->
         <mockito.version>1.10.19</mockito.version>
-        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
-        <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
+        <assertj.version>3.22.0</assertj.version>
+        <junit.version>4.13.2</junit.version>
+        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
         
         <!-- Maven plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -55,11 +57,11 @@
         <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
         <groovy-all.version>2.4.16</groovy-all.version>
-        <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-        <license-maven-plugin.version>4.0.rc2</license-maven-plugin.version>
+        <license-maven-plugin.version>4.1</license-maven-plugin.version>
 
         <!-- Sonar -->
         <sonar.projectKey>bonitasoft_bonita-connector-shell-script</sonar.projectKey>
@@ -70,8 +72,8 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.bonitasoft.engine</groupId>
-                <artifactId>bonita-engine</artifactId>
+                <groupId>org.bonitasoft.runtime</groupId>
+                <artifactId>bonita-runtime-bom</artifactId>
                 <version>${bonita.engine.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -92,12 +94,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <scope>test</scope>
+            <version>${assertj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
