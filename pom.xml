@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.bonitasoft.connectors</groupId>
@@ -32,33 +34,32 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyy.MM.dd-hh.mm</maven.build.timestamp.format>
-        
+
         <!--Shell Connector -->
         <shell.def.id>scripting-shell</shell.def.id>
         <shell.def.version>1.0.0</shell.def.version>
         <shell.impl.id>${shell.def.id}-impl</shell.impl.id>
         <shell.impl.version>${project.version}</shell.impl.version>
         <shell.main-class>org.bonitasoft.connectors.shell.ShellConnector</shell.main-class>
-    
+
         <!-- Bonita -->
         <bonita.engine.version>7.13.0</bonita.engine.version>
-        
+
         <!-- Test -->
         <mockito.version>1.10.19</mockito.version>
         <assertj.version>3.22.0</assertj.version>
         <junit.version>4.13.2</junit.version>
-        <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
-        
+
         <!-- Maven plugins -->
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
         <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
         <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
-        <groovy-all.version>2.4.16</groovy-all.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <groovy.version>3.0.11</groovy.version>
+        <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
         <license-maven-plugin.version>4.1</license-maven-plugin.version>
@@ -68,7 +69,7 @@
         <sonar.organization>bonitasoft</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -89,7 +90,7 @@
             <version>${bonita.engine.version}</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>
@@ -125,6 +126,10 @@
         </resources>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
@@ -166,8 +171,8 @@
                     <dependencies>
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
-                            <artifactId>groovy-all</artifactId>
-                            <version>${groovy-all.version}</version>
+                            <artifactId>groovy</artifactId>
+                            <version>${groovy.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -175,11 +180,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <enableAssertions>true</enableAssertions>
-                        <forkCount>1</forkCount>
-                        <reuseForks>true</reuseForks>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -296,7 +296,8 @@
     </build>
 
     <profiles>
-        <!-- Deployment profile (required so these plugins are only used when deploying) -->
+        <!-- Deployment profile (required so these plugins are only used 
+            when deploying) -->
         <profile>
             <id>deploy</id>
             <build>
@@ -314,7 +315,8 @@
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
-                                    <!-- Prevent `gpg` from using pinentry programs -->
+                                    <!-- Prevent `gpg` from using pinentry 
+                                        programs -->
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
                                         <arg>loopback</arg>
