@@ -4,10 +4,10 @@
 
 - **Name**: Bonita Shell Connector
 - **Artifact**: `org.bonitasoft.connectors:bonita-connector-shell-script`
-- **Version**: 1.1.4-SNAPSHOT
+- **Version**: 2.0.0-SNAPSHOT (2.x: Bonita 12.0+ / Java 17; Bonita 7.13 - 11.x use the 1.x versions)
 - **Description**: Bonita connector that executes an arbitrary shell script by writing it to a temporary file and invoking a configurable interpreter (bash, sh, cmd, PowerShell, etc.).
 - **License**: GPL-2.0
-- **Tech stack**: Java 11, Maven, Bonita Engine 7.14.0, JUnit 4, Mockito 1.x, AssertJ
+- **Tech stack**: Java 17, Maven, Bonita runtime 12.0 (`bonita-runtime-bom`), JUnit 4, Mockito 1.x, AssertJ
 
 ## Build Commands
 
@@ -52,7 +52,7 @@ AbstractConnector (bonita-common)
 - **Minimal design**: The entire implementation is one class (`ShellConnector`).
 - **Script file lifecycle**: The script string is written to a `File.createTempFile()`, made executable, executed via `ProcessBuilder`, then deleted in a `cleanUp()` step. `deleteOnExit()` is also set as a safety net.
 - **Interpreter dispatch**: The file extension is derived from the `interpreter` input (`.bat` for `cmd`, `.ps1` for `powershell`, `.sh` for `sh`/`bash`).
-- **Process invocation**: `ProcessBuilder([interpreter, parameter, scriptPath]).redirectErrorStream(true)` — stderr is merged into stdout.
+- **Process invocation**: `ProcessBuilder([interpreter, parameter, scriptPath]).redirectErrorStream(true)` — stderr is merged into stdout. A runtime whose security manager denies process execution (the Bonita 12 Docker image runs ProGrade with `PRO_GRADE=true`) makes the connector fail with `access denied ("java.io.FilePermission" "<interpreter>" "execute")`.
 - **Input parameters**:
   - `interpreter` (String) — path or name of the shell interpreter (e.g., `/bin/bash`, `cmd`); mandatory.
   - `parameter` (String) — interpreter flag to accept a script file (e.g., `-c` for bash, `/C` for cmd); mandatory.
